@@ -38,4 +38,5 @@ Route::group(['middleware' => ['web','auth']], function () {
     });
     Route::get('/home',['as'=>'home','uses'=>'RicetteController@isAdmin']);
     Route::get('/recipes',['as'=>'recipes','uses'=>'RicetteController@showall']);
+    Route::get('/recipes/{recipe_id}',['as'=>'recipes','uses'=>'RicetteController@showone']);
 });    

@@ -10,6 +10,11 @@ class Recipe extends Model
     
     public function ingredients()
     {
-        return $this->belongsToMany('App\Ingredient','recipe_ingredient','recipe_id','ingredient_id');
+        return $this->belongsToMany('App\Ingredient','recipe_ingredient','recipe_id','ingredient_id')->withPivot('quantity', 'type');
+    }
+    
+    public function user()
+    {
+        return $this->belongsTo('App\User','recipe_id');
     }
 }
