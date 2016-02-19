@@ -20,8 +20,16 @@
                         Utente
                     @endif
                 </td>
-                <td><a class="btn btn-danger" href="users/{{ $user->id }}" role="button">Elimina Utente</a></td>
-                <td><a class="btn btn-success" href="users/{{ $user->id }}" role="button">Modifica Permessi</a></td>
+                @if ($user->id != Auth::user()->id)
+                {!! Form::open(['url'=>['user',$user->id], 'method'=>'delete']) !!}
+                <td>{!! Form::submit('Elimina Utente',['class'=>'btn btn-danger','onclick'=>'return confirm("Sei sicuro di voler cancellare l\'utente?");']) !!}</td>
+
+                {!! Form::close() !!}
+                {!! Form::open(['url'=>['user',$user->id], 'method'=>'put']) !!}
+                <td>{!! Form::submit('Modifica Permessi',['class'=>'btn btn-success']) !!}</td>
+
+                {!! Form::close() !!}
+                @endif
             </tr>
         @endforeach
     </table> 

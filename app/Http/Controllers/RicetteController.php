@@ -49,4 +49,40 @@ class RicetteController extends Controller
         //write the view!
         //return view('showone',['recipe'=>$recipe]);
     }
+    
+    
+    //to finish
+    public function search($search_input)
+    {
+        $titlesMatches = \App\Recipe::where('title','like','%($search_input)%');
+        $proceduresMatches = \App\Recipe::Where('procedure','like','%($search_input)%');
+        
+        dd($titlesMatches);
+        
+        //write the view!
+        //return view('results',['titlesMatches'=>$titlesMatches,'proceduresMatches'=>$proceduresMatches]);
+    }
+    
+    //change from 'user' to 'admin' and vice-versa
+    public function changePerm($user_id)
+    {
+        $user = \App\User::findOrFail($user_id);
+        if ($user->isAdmin == 0)
+        {
+            $user->isAdmin = 1;
+        }
+        else 
+        {
+            $user->isAdmin = 0;
+        }
+        $user->save();
+        return redirect()->route('home');
+    }
+    
+    //well......deletes the selected user :(
+    public function deleteUser($user_id)
+    {
+        \App\User::destroy($user_id);
+        return redirect()->route('home');
+    }
 }

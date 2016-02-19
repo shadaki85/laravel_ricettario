@@ -37,6 +37,15 @@ Route::group(['middleware' => ['web','auth']], function () {
         return redirect()->route('home');
     });
     Route::get('/home',['as'=>'home','uses'=>'RicetteController@isAdmin']);
+    
+    //recipes routing
     Route::get('/recipes',['as'=>'recipes','uses'=>'RicetteController@showall']);
     Route::get('/recipes/{recipe_id}',['as'=>'recipes','uses'=>'RicetteController@showone']);
+    
+    //search route
+    Route::get('/search/{search_input}',['as'=>'search','uses'=>'RicetteController@search']);
+    
+    //admin routing for manipulating users
+    Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@changePerm']);
+    Route::delete('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@deleteUser']);
 });    
