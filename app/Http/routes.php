@@ -39,8 +39,18 @@ Route::group(['middleware' => ['web','auth']], function () {
     Route::get('/home',['as'=>'home','uses'=>'RicetteController@isAdmin']);
     
     //recipes routing
-    Route::get('/recipes',['as'=>'recipes','uses'=>'RicetteController@showall']);
-    Route::get('/recipes/{recipe_id}',['as'=>'recipes','uses'=>'RicetteController@showone']);
+    Route::get('/recipes',['as'=>'recipes','uses'=>'RicetteController@showAll']);
+    Route::get('/recipes/new',function(){
+        return view('create');
+    });
+    Route::post('/recipes',['as'=>'create.process','uses'=>'RicetteController@processInsert']);
+    
+    //single recipe routing
+    Route::get('/recipes/{recipe_id}',['as'=>'recipes','uses'=>'RicetteController@showOne']);
+    Route::get('/recipes/{recipe_id}/edit',function(){
+        return view('edit');
+    });    
+    Route::put('/recipes/{recipe_id}',['as'=>'modifyProcess','uses'=>'RicetteController@processUpdate']);
     
     //search route
     Route::get('/search/{search_input}',['as'=>'search','uses'=>'RicetteController@search']);
@@ -48,4 +58,7 @@ Route::group(['middleware' => ['web','auth']], function () {
     //admin routing for manipulating users
     Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@changePerm']);
     Route::delete('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@deleteUser']);
+    
+    //api
+    Route::get('/api/ingredients',['as'=>'getIngredients','uses'=>'RicetteController@exposeJson']);
 });    

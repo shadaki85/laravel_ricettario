@@ -18,7 +18,7 @@ class CreateRecipeIngredientTable extends Migration
             $table->integer('recipe_id');
             $table->integer('quantity');
             //type: 0 => g, 1 => cl, 2 => units.
-            $table->integer('type');
+            $table->string('type');
             $table->timestamps();
         });
     }

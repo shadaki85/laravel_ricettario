@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Recipe extends Model
 {
-    protected $fillable = ['title','procedure','ingredient_id'];
+    protected $fillable = ['title','procedure','user_id'];
     
     public function ingredients()
     {
-        return $this->belongsToMany('App\Ingredient','recipe_ingredient','recipe_id','ingredient_id')->withPivot('quantity', 'type');
+        return $this->belongsToMany('App\Ingredient','recipe_ingredient','recipe_id','ingredient_id')->withPivot('quantity');
     }
     
     public function user()
