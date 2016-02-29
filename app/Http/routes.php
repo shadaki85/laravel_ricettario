@@ -23,42 +23,54 @@
 |
 */
 
-
-//If not logged-in, you are redirected to login/register page.
+/****************************************************
+* UNLOGGED USERS SECTION
+****************************************************/
 Route::group(['middleware' => ['web']], function () {
     Route::auth();
 });
 
 
-//if logged-in (thanks to middleware auth) and calling root path (/) returns home routing
-//home route uses isAdmin method to check user type and redirect.
+/****************************************************
+* LANDING SECTION
+****************************************************/
 Route::group(['middleware' => ['web','auth']], function () {
     Route::get('/', function(){
-        return redirect()->route('home');
+        return redirect()->route('recipes');
     });
-    Route::get('/home',['as'=>'home','uses'=>'RicetteController@isAdmin']);
-    
-    //recipes routing
+
+    /****************************************************
+    * RECIPES SECTION
+    ****************************************************/
     Route::get('/recipes',['as'=>'recipes','uses'=>'RicetteController@showAll']);
     Route::get('/recipes/new',function(){
         return view('create');
     });
     Route::post('/recipes',['as'=>'create.process','uses'=>'RicetteController@processInsert']);
     
-    //single recipe routing
-    Route::get('/recipes/{recipe_id}',['as'=>'recipes','uses'=>'RicetteController@showOne']);
-    Route::get('/recipes/{recipe_id}/edit',function(){
-        return view('edit');
-    });    
-    Route::put('/recipes/{recipe_id}',['as'=>'modifyProcess','uses'=>'RicetteController@processUpdate']);
     
-    //search route
+    /****************************************************
+    * SINGLE RECIPE SECTION
+    ****************************************************/
+    Route::get('/recipes/{recipe_id}',['as'=>'recipe','uses'=>'RicetteController@showOne']);
+    Route::get('/recipes/{recipe_id}/edit',['as'=>'recipe','uses'=>'RicetteController@updateRecipe']);    
+    Route::put('/recipes/{recipe_id}',['as'=>'recipe','uses'=>'RicetteController@processUpdate']);
+    Route::delete('/recipes/{recipe_id}',['as'=>'recipe','uses'=>'RicetteController@deleteRecipe']);
+    
+    
+    /****************************************************
+    * SEARCH AND API SECTION
+    ****************************************************/
     Route::get('/search/{search_input}',['as'=>'search','uses'=>'RicetteController@search']);
-    
-    //admin routing for manipulating users
-    Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@changePerm']);
-    Route::delete('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@deleteUser']);
-    
-    //api
     Route::get('/api/ingredients',['as'=>'getIngredients','uses'=>'RicetteController@exposeJson']);
+    
+    
+    /****************************************************
+    * ADMIN SECTION
+    ****************************************************/
+    Route::group(['middleware' => 'isadmin'], function(){
+        Route::get('/home/admin',['as'=>'home.admin','uses'=>'RicetteController@adminHome']);
+        Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@changePerm']);
+        Route::delete('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@deleteUser']);
+    });
 });    

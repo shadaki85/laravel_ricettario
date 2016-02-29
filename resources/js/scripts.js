@@ -105,13 +105,20 @@ $(document).ready(function(){
         //let the user see what he has selected
         $('#selected').append(newIngr+' ');
         
-        //add the ingredient inserted into our array to use it for further checks
-        newIngredientsInserted.push(newIngr);
         
-        //append an hidden field to use with Request
-//////////$('#form').append('<input type="hidden" name="'+newIngred+counter2.toString()+'" value="'+newIngr+'">');
-        newIngred[counter2] = newIngr;
-        counter2++;
+        //POST the new ingredient via AJAX call
+        $.ajax({
+            type: "POST",
+            data : {'newingr':newIngr, '_token': $('input[name=_token]').val()},
+            url: "../recipes"
+        });
+        
+        //add the ingredient inserted into our array to use it for further checks
+        //newIngredientsInserted.push(newIngr);
+        
+        //newIngred[counter2] = newIngr;
+        //counter2++;
+        
         //reset newingredient field and disable buttons
         $('#newingredient').val('');
         $('#selectIngredient').prop('disabled',true);
@@ -119,18 +126,7 @@ $(document).ready(function(){
         return true;
     });
     
-    $('#form').submit(function(){
-        $.ajax({
-            type: "POST",
-            data : {'data':'test',  '_token': $('input[name=_token]').val()},
-            //data: {data:{ingred,newIngred}},
-            url: "../recipes",
-            success: function(data){
-             console.log(data);
-            },
-            error: function(){
-             console.log("error");
-            }
-        });
+   // $('#form').submit(function(){
+    $('#newIngredientButton').click(function(){
     });
 });

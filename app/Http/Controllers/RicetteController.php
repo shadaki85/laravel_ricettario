@@ -15,50 +15,18 @@ class RicetteController extends Controller
     //Test Search method
     //write Insert, Modify and Delete recipes, their respective views,controllers and routes
     
+    /****************************************************
+    * ADMIN SECTION
+    ****************************************************/
     
-    //checks if the user is an Admin and reroute to the right view.
-    public function isAdmin()
+    //admin user-list page
+    public function adminHome()
     {   
         $users = \App\User::all();
-        $user = \App\User::findOrFail(Auth::user()->id);
-        if ($user->isAdmin == 1){
-            return view('admin',['users'=>$users]);
-        } else {
-            return view('show',['users'=>$users]);
-        }
+        return view('admin',['users'=>$users]);
     }
-    
-    //returns a collection of ALL the recipes. ($recipes)
-    public function showAll()
-    {
-        $users = \App\User::all();
-
-        return view('show',['users'=>$users]);
-    }
-    
-    //returns the single $recipe_id recipe.
-    public function showOne($recipe_id)
-    {
-        $user = \App\User::findOrFail(Auth::user()->id);
-        $recipe = \App\Recipe::find($recipe_id);
-        return view('showone',['recipe'=>$recipe]);
-    }
-    
-    
-    //to finish
-    public function search($search_input)
-    {
-        $titlesMatches = \App\Recipe::where('title','like','%($search_input)%');
-        $proceduresMatches = \App\Recipe::Where('procedure','like','%($search_input)%');
-        $usersMatches = \App\Recipe::Where('name','like','%($search_input)%');
         
-        dd($titlesMatches);
-        
-        //write the view!----------------------------------------------------------------------------------------------------------------------
-        //return view('results',['titlesMatches'=>$titlesMatches,'proceduresMatches'=>$proceduresMatches]);
-    }
-    
-    //change from 'user' to 'admin' and vice-versa
+     //change from 'user' to 'admin' and vice-versa
     public function changePerm($user_id)
     {
         $user = \App\User::findOrFail($user_id);
@@ -71,7 +39,7 @@ class RicetteController extends Controller
             $user->isAdmin = 0;
         }
         $user->save();
-        return redirect()->route('home');
+        return redirect()->route('admin');
     }
     
     //deletes the selected user (and his recipes) :(
@@ -90,33 +58,55 @@ class RicetteController extends Controller
         {
             \App\User::destroy($user_id);
         }
-        return redirect()->route('home');
+        return redirect()->route('admin');
     }
     
-    //--------------------------------------------------------------------------TO TEST
+    /****************************************************
+    * RECIPES SECTION
+    ****************************************************/
+    
+    //user landing page
+    //returns a collection of ALL the recipes. ($recipes)
+    public function showAll()
+    {
+        $users = \App\User::all();
+
+        return view('show',['users'=>$users]);
+    }
+    
+    //returns the single $recipe_id recipe.
+    public function showOne($recipe_id)
+    {
+        $user = \App\User::findOrFail(Auth::user()->id);
+        $recipe = \App\Recipe::find($recipe_id);
+        return view('showone',['recipe'=>$recipe]);
+    }
+
     //will delete the recipe (really?)
     public function deleteRecipe($recipe_id)
     {
-        //$recipe = \App\Recipe::find($recipe_id);
         \App\Recipe::destroy($recipe_id);
-        return redirect()->route('home');
+        return redirect()->route('recipes');
     }
     
-    
-    //TODO
-    public function processUpdate(Request $request,$recipe_id)
+    public function updateRecipe($recipe_id)
     {
         $recipe = \App\Recipe::findOrFail($recipe_id);
+        return view('edit',['recipe'=>$recipe]);
+    }
+    
+    //TODO
+    public function updateProcess(Request $request)
+    {
     }
     
     //to finish
     public function processInsert(Request $request)
     {
-        if($request->ajax()) {
-      $data = Input::all();
-      print_r($data);die;
-        }
-        dd($request);
+        
+        dd($request->newingr);
+        
+        
         //validate user inputs. we need at least 1 ingredient
         if (isset($request->newingr1) || isset($request->ingr1) ){
             $this->validate($request,['title'=>'required','procedure'=>'required']);
@@ -178,9 +168,22 @@ class RicetteController extends Controller
         }
     }
     
+    /****************************************************
+    * SEARCH AND JSON SECTION
+    ****************************************************/
     
-    
-    
+    //to finish
+    public function search($search_input)
+    {
+        $titlesMatches = \App\Recipe::where('title','like','%($search_input)%');
+        $proceduresMatches = \App\Recipe::Where('procedure','like','%($search_input)%');
+        $usersMatches = \App\Recipe::Where('name','like','%($search_input)%');
+        
+        dd($titlesMatches);
+        
+        //write the view!----------------------------------------------------------------------------------------------------------------------
+        //return view('results',['titlesMatches'=>$titlesMatches,'proceduresMatches'=>$proceduresMatches]);
+    }
     
     //expose a json with all the ingredients
     public function exposeJson()
