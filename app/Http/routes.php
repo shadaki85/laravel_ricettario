@@ -48,6 +48,8 @@ Route::group(['middleware' => ['web','auth']], function () {
     });
     Route::post('/recipes',['as'=>'create.process','uses'=>'RicetteController@processInsert']);
     
+    //test
+    Route::post('/newingredientinsert',['as'=>'new.ingredient','uses'=>'RicetteController@processInsertIngredient']);
     
     /****************************************************
     * SINGLE RECIPE SECTION

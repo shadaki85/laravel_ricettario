@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use Input;
+use Validator;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -89,6 +90,8 @@ class RicetteController extends Controller
         return redirect()->route('recipes');
     }
     
+    
+    //pass the $recipe to edit to the view
     public function updateRecipe($recipe_id)
     {
         $recipe = \App\Recipe::findOrFail($recipe_id);
@@ -100,73 +103,53 @@ class RicetteController extends Controller
     {
     }
     
-    //to finish
+    //Inserts title, procedure, user id and ingredients needed.
     public function processInsert(Request $request)
     {
+        //validate user inputs. we need at least 1 ingredient, title and procedure
+        $rules = [ 
+                'data.title' => 'required',
+                'data.procedure' => 'required',
+                'data.ingred' => 'required_without:data.newIngred',
+            ];
+            
+        $messages = [
+                'data.title.required' => 'Il titolo è richiesto!',
+                'data.procedure.required'  => 'La procedura per la preparazione della ricetta è obbligatoria!',
+                'data.ingred.required_without' => 'E necessario almeno un ingrediente!',
+            ];
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $errors = $validator->errors();
+        $errors =  json_decode($errors);
         
-        dd($request->newingr);
-        
-        
-        //validate user inputs. we need at least 1 ingredient
-        if (isset($request->newingr1) || isset($request->ingr1) ){
-            $this->validate($request,['title'=>'required','procedure'=>'required']);
-        }else{
-            //TODO----------------------------------------------------------------------------------------------------------
-            dd("return error - TO DO");
+        if ($validator->fails()) {
+            return response()->json([
+            'message' => $errors
+            ], 422);
         }
-        
-        dd("STOP! needs to be finished!");
-        //$pivot = \App\Recipe_Ingredient::all();
-        //dd($pivot);
-        
+
+
         //this we will need to add in the new recipe
         $userid = Auth::user()->id;
-        
-        //insert the values!
-////////$recipe = \App\Recipe::create(['title'=>$request->title , 'procedure'=>$request->procedure , 'user_id'=>$userid]);
-        
-        //dd($recipe);
 
-        //let's store all the ingredients needed in $ingredients array (minus the new ingredients)
-        $i=1;
-        $ingr="ingr".$i;
-        while (isset($request->$ingr))
-        {
-            $ingr="ingr".$i;
-            if ($request->$ingr != null)
-            {
-                $ingredientsNeededInRecipe[] = $request->$ingr;
-            }
-            $i++;
-        }
-        
-        //let's store all the NEW ingredients added in DB and in $ingredients[] array
-        $i=1;
-        $newingr="newingr".$i;
-        while (isset($request->$newingr))
-        {
-            $newingr="newingr".$i;
-            if ($request->$newingr != null)
-            {
-////////////////$newIngredients = \App\Ingredient::create(['name'=>$request->$newingr,'type'=>'TODO']);
-                $ingredientsNeededInRecipe[] = $request->$newingr;
-            }
-            $i++;
-        }
-        
-        dd($ingredientsNeededInRecipe);
-        //$ingreCheck = \App\Ingredient::all();
-        //dd($ingreCheck);
-        
-        foreach ($ingredientsNeededInRecipe as $ingredientNeededInRecipe){
-            
-            //find every ingredient's id
-            $findIngr = \App\Ingredient::findOrFail($ingredientNeededInRecipe);
-            
-            //create new record into pivot table recipe-ingredient!
-            //$pivot = \App\Recipe_Ingredient::create(['recipe_id'=>$recipe->id,'ingredient_id'=>$findIngr->id,'quantity'=>'TODO']);
+       
+        //insert the recipe values!
+        $recipe = \App\Recipe::create(['title'=>$request->data['title'] , 'procedure'=>$request->data['procedure'] , 'user_id'=>$userid]);
+
+
+        //create new record into pivot table recipe-ingredient for each ingredient needed!
+        foreach ($request->data['ingred'] as $ingr){
+            $ingrInDb = \App\Ingredient::where('name','=',$ingr['name'])->first();
+            $pivot = \App\Recipe_Ingredient::create(['recipe_id'=>$recipe->id,'ingredient_id'=>$ingrInDb->id,'quantity'=>$ingr['quantity']]);
         }
     }
+    
+    //insert new ingredient into DB
+    public function processInsertIngredient(Request $request)
+    {
+        $newIngredientInsert = \App\Ingredient::create(['name'=>$request->newingr['name'],'type'=>$request->newingr['type']]);
+    }
+    
     
     /****************************************************
     * SEARCH AND JSON SECTION
@@ -191,4 +174,13 @@ class RicetteController extends Controller
         $ingredients = \App\Ingredient::all();
         return response()->json($ingredients);
     }
+    
+    //validator messages override
+    public function messages()
+    {
+    return [
+        'data.title.required' => 'Il titolo è richiesto!',
+        'data.procedure.required'  => 'La procedura per la preparazione della ricetta è obbligatoria!',
+    ];
+}
 }

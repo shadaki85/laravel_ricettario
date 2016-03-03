@@ -4,17 +4,20 @@ $(document).ready(function(){
     //some vars needed soon
     var counter1 = 0;
     var counter2 = 0;
-    //var newIngred = "newingr";
-    //var ingred = "ingr";
     var ingred = [];
     var newIngred = [];
     var ddl = $('#ingredients');
+    var newingredient = $('#newingredient');
+    var typeNew = $('#typeNew');
+    var type = $('#type');
+    var ingrQuantity = $('#ingrQuantity');
+    var newIngrQuantity = $('#newIngrQuantity');
     var getJsn;
-    var data = [ingred,newIngred];
-    var newIngredientsInserted = new Array();
-    $('#selectIngredient').prop('disabled',true);
-    $('#newIngredientButton').prop('disabled',true);
+    var title = $('#title');
+    var procedure = $('#procedure');
     
+    $('#selectIngredientButton').prop('disabled',true);
+    $('#newIngredientButton').prop('disabled',true);
     
     //buttons will be clickable only if we have something selected/in the input textbox
     $('#newingredient').keyup(function(){
@@ -25,14 +28,14 @@ $(document).ready(function(){
         }
     });
     
+    //activate selection button if something is selected!
     ddl.change(function(){
         if (ddl.val() != ""){
-            $('#selectIngredient').prop('disabled',false);
+            $('#selectIngredientButton').prop('disabled',false);
         } else {
-            $('#selectIngredient').prop('disabled',true);
+            $('#selectIngredientButton').prop('disabled',true);
         }
     });
-    
     
     //populate drop down list from JSON storing JSON in var getJsn
     $.getJSON("../api/ingredients", function(result) {
@@ -42,91 +45,169 @@ $(document).ready(function(){
         getJsn  = result;
 
     });
-    
-    
-    //on select ingredient button click, do something:
-    $('#selectIngredient').click(function(){
+
+    //handle select ingredient button click
+    $('#selectIngredientButton').click(function(){
         var selected = ddl.val();
-        if (selected != null)
+        $('#already').text('');
+        $('#already2').text('');
+        
+        if (selected != null && type.val() != null && ingrQuantity.val() != "" && !isNaN(ingrQuantity.val()))
         {
             //let the user see what he has selected
-            $('#selected').append(selected+' ');
+            $('#selected').append(selected+' '+ingrQuantity.val()+' '+type.val()+'<br />');
             
             //remove the selected ingredient from the ddl 
             $('#ingredients :selected').remove();
-            
-            //append an hidden field to use with Request
-//////////////$('#form').append('<input type="hidden" name="'+ingred+counter1.toString()+'" value="'+selected+'">');
-            ingred[counter1] = selected;
-            console.log(ingred[0]);
+
+            //add values to array
+            ingred[counter1] = {
+                'name':selected,
+                'quantity':ingrQuantity.val(),
+                'type':type.val()
+            };
             counter1++;
-            //clear the selection and disable the buttons
+            //clear the selection and input and disable the buttons
             ddl.val('');
-            $('#selectIngredient').prop('disabled',true);
+            ingrQuantity.val('');
+            $('#selectIngredientButton').prop('disabled',true);
             $('#newIngredientButton').prop('disabled',true);
         }
+        else if (type.val() == null)
+        {
+            $('#already').text('');
+            $('#already').text('Selezione errata!');
+        }
+        else if (ingrQuantity.val() == "" || isNaN(ingrQuantity.val()))
+        {
+            $('#already').text('');
+            $('#already').text('Quantità errata!');
+        }
     });
     
-    
-    
-    //handles new ingredient button click event. checks if the ingredient is already present in JSON or already inserted.
+    //handles new ingredient button click event. checks if the ingredient is already present in database or already selected.
     $('#newIngredientButton').click(function(){
+        
+        $('#already2').text('');
         $('#already').text('');
-        var newIngr = $('#newingredient').val().toLowerCase();
-        for (var i = 0; i < getJsn.length; i++)
+
+        if(newingredient.val() != '' && newIngrQuantity.val() != '' && !isNaN(newIngrQuantity.val()) && typeNew.val() != null)
         {
-            if (getJsn[i].name == newIngr)
+            
+            var newIngr = newingredient.val().toLowerCase();
+            
+            
+            //presence check
+            for (var i = 0; i < getJsn.length; i++)
             {
-            //ingredient already present
-            $('#already').append('Ingrediente già presente!');
-            //reset newingredient field and disable buttons
-            $('#newingredient').val('');
-            $('#selectIngredient').prop('disabled',true);
-            $('#newIngredientButton').prop('disabled',true);            
-            return false;
+                if (getJsn[i].name == newIngr)
+                {
+                //ingredient already present
+                $('#already2').append('Ingrediente già presente!');
+                //reset newingredient field and disable buttons
+                newingredient.val('');
+                newIngrQuantity.val('');
+                $('#selectIngredientButton').prop('disabled',true);
+                $('#newIngredientButton').prop('disabled',true);            
+                return false;
+                }
             }
+            
+            //add the ingredient into newIngredientsInserted and check if the ingredient is already inserted.
+            for (var i = 0; i < newIngred.length; i++)
+            {
+                if (newIngred[i]['name'] == newIngr)
+                {
+                //ingredient already present
+                $('#already2').append('Ingrediente già presente!');
+                //reset newingredient field and disable buttons
+                newingredient.val('');
+                newIngrQuantity.val('');
+                $('#selectIngredientButton').prop('disabled',true);
+                $('#newIngredientButton').prop('disabled',true);            
+                return false;
+                }
+            }
+            
+            //let the user see what he has selected
+            $('#selected').append(newIngr+' '+newIngrQuantity.val()+' '+typeNew.val()+'<br />');
+            
+            //add values to array
+            newIngred[counter2] = {
+                'name':newIngr,
+                'quantity':newIngrQuantity.val(),
+                'type':typeNew.val()
+            };
+
+            //reset newingredient field and disable buttons
+            newingredient.val('');
+            newIngrQuantity.val('');
+            $('#selectIngredientButton').prop('disabled',true);
+            $('#newIngredientButton').prop('disabled',true);
+            
+            //POST the new ingredient via AJAX call
+            $.ajax({
+                type: "POST",
+                data : {'newingr':newIngred[counter2], '_token': $('input[name=_token]').val()},
+                url: "../newingredientinsert"
+            });
+            
+            counter2++;
+            return true;
+            
         }
-        
-        //add the ingredient into newIngredientsInserted and check if the ingredients is already present in the user inserted.
-        for (var i = 0; i < newIngredientsInserted.length; i++)
+        else if(typeNew.val() == null)
         {
-            if (newIngredientsInserted[i] == newIngr)
-            {
-            //ingredient already present
-            $('#already').append('Ingrediente già presente!');
-            //reset newingredient field and disable buttons
-            $('#newingredient').val('');
-            $('#selectIngredient').prop('disabled',true);
-            $('#newIngredientButton').prop('disabled',true);            
-            return false;
-            }
+            $('#already2').text('');
+            $('#already2').text('Selezione errata!');    
         }
-        
-        //let the user see what he has selected
-        $('#selected').append(newIngr+' ');
-        
-        
-        //POST the new ingredient via AJAX call
-        $.ajax({
-            type: "POST",
-            data : {'newingr':newIngr, '_token': $('input[name=_token]').val()},
-            url: "../recipes"
-        });
-        
-        //add the ingredient inserted into our array to use it for further checks
-        //newIngredientsInserted.push(newIngr);
-        
-        //newIngred[counter2] = newIngr;
-        //counter2++;
-        
-        //reset newingredient field and disable buttons
-        $('#newingredient').val('');
-        $('#selectIngredient').prop('disabled',true);
-        $('#newIngredientButton').prop('disabled',true);
-        return true;
+        else if(newIngrQuantity.val() == '' || isNaN(newIngrQuantity.val()))
+        {
+            $('#already2').text('');
+            $('#already2').text('Quantità errata!');
+        }
     });
     
-   // $('#form').submit(function(){
-    $('#newIngredientButton').click(function(){
+    // POSTing with AJAX recipe and ingredients!
+    $('#inviaButton').click(function(){    
+        var data = {
+            'title':title.val(),
+            'procedure':procedure.val(),
+            'ingred':ingred.concat(newIngred)
+        };
+        
+        var errList = $('#validatorErrorList');
+        $.ajax({
+            
+            type: "POST",
+            data : {'data':data, '_token': $('input[name=_token]').val()},
+            url: "../recipes",
+            
+            //on success redirect to recipes home page
+            success:function(){
+                window.location.href = '../recipes';
+            },
+            
+            //on validator error, show the error list
+            error: function(xhr,status, response) {
+                errList.text("");
+                var error = jQuery.parseJSON(xhr.responseText);
+                
+                for(var e in error.message){
+                    if(error.message.hasOwnProperty(e)){
+                        error.message[e].forEach(function(val){
+                            errList.append('<li>'+val+'</li>');
+                        });
+                    }
+                }
+            },
+            
+            //the sending process may take a while, show that we are processing data!
+            beforeSend: function () {
+                errList.text("");
+                errList.text("Inserimento ricetta...attendere!");
+            }
+        });
     });
+
 });

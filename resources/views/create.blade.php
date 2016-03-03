@@ -5,40 +5,49 @@
 @section('content')
 <div class="col-md-10 col-md-offset-1">
     <h1>Ciao {{ Auth::user()->name }}, aggiungi una ricetta!</h1>
-        {!! Form::open(['url'=>'recipes', 'method'=>'post', 'id'=>'form']) !!}
+        {!! Form::open(['url'=>'recipes', 'method'=>'post', 'id'=>'form', 'class'=>'form-inline']) !!}
         <div class="form-group">
-            {!! Form::label('title','Titolo') !!}
-            {!! Form::text('title',null,['class'=>'form-control','placeholder'=>'Titolo']) !!}
-            {!! Form::label('procedure','Procedura') !!}
-            {!! Form::textarea('procedure',null,['class'=>'form-control','placeholder'=>'Procedura']) !!}
-            {!! Form::label('ingredients','Seleziona gli ingredienti necessari:') !!}
-            <div id='selected'></div>
-            {!! Form::select('ingredients', [],null,['placeholder'=>'Seleziona...','class'=>'form-control','id'=>'ingredients']) !!}
-            {!! Form::button('Seleziona',['class'=>'btn btn-default','id'=>'selectIngredient']) !!}
+            {!! Form::text('title',null,['class'=>'form-control','placeholder'=>'Titolo','id'=>'title']) !!}<br />
+            {!! Form::textarea('procedure',null,['class'=>'form-control pull-left','placeholder'=>'Procedura','id'=>'procedure']) !!}
+            <div style="float:left;" id='selected'></div>
             <br />
-            {!! Form::label('newingredient','Non trovi gli ingredienti necessari? Aggiungili tu:') !!}
-            {!! Form::text('newingredient',null,['class'=>'form-control', 'id'=>'newingredient']) !!}
+            {!! Form::label('ingredients','Seleziona gli ingredienti necessari:') !!}
+            <br />
+            {!! Form::select('ingredients', [],null,['placeholder'=>'Seleziona...','class'=>'form-control','id'=>'ingredients']) !!}
+            {!! Form::text('ingrQuantity',null,['class'=>'form-control', 'id'=>'ingrQuantity','placeholder'=>'Quantità']) !!}
+            {!! Form::select('type', ['gr'=>'gr','cl'=>'cl','unità'=>'unità'],null,['class'=>'form-control','id'=>'type']) !!}
+            <br />
+            {!! Form::button('Aggiungi',['class'=>'btn btn-default','id'=>'selectIngredientButton']) !!}
+            <br />
             <p id='already'></p>
-            {!! Form::button('Inserisci',['class'=>'btn btn-default','id'=>'newIngredientButton']) !!}
+            {!! Form::label('newingredient','Non trovi gli ingredienti necessari? Aggiungili tu:') !!}
+            <br />
+            {!! Form::text('newingredient',null,['class'=>'form-control', 'id'=>'newingredient']) !!}
+            {!! Form::text('newIngrQuantity',null,['class'=>'form-control', 'id'=>'newIngrQuantity','placeholder'=>'Quantità']) !!}
+            {!! Form::select('type', ['gr'=>'gr','cl'=>'cl','unità'=>'unità'],null,['class'=>'form-control','id'=>'typeNew']) !!}
+            <br />
+            {!! Form::button('Aggiungi',['class'=>'btn btn-default','id'=>'newIngredientButton']) !!}
+            <p id='already2'></p>
         </div>
+        <div style="height:20px;"></div>
         <table>
             <tr>
                 <td>
-                    {!! Form::submit('Invia',['class'=>'btn btn-success','data-token'=> csrf_token()]) !!}
                     {!! Form::close() !!}
+                    <a id="inviaButton" class="btn btn-success" data-token="{!! csrf_token() !!}">Invia</a>
                 </td>
                 <td>
-                    <a class="btn btn-danger" href="../article" role="button">Back</a></td>
+                    <a class="btn btn-danger" href="../recipes" role="button">Back</a></td>
                 </td>
             </tr>    
         </table>
         
-        @if($errors->any())
-            <ul class="alert alert-danger">
-                @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
+            <ul id="validatorErrorList">
+            
             </ul>
-        @endif
+       
 </div>        
+@endsection
+@section('scripts')
+    <script src="../../resources/js/scripts.js"></script>
 @endsection
