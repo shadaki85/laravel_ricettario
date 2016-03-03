@@ -14,7 +14,8 @@ class RicetteController extends Controller
 {
     //TODO:
     //Test Search method
-    //write Insert, Modify and Delete recipes, their respective views,controllers and routes
+    //Write edit recipes method and Testing 
+    //Write a method to show all the ingredients in database and the way to edit them (admin only) - view and routing also
     
     /****************************************************
     * ADMIN SECTION
@@ -90,7 +91,6 @@ class RicetteController extends Controller
         return redirect()->route('recipes');
     }
     
-    
     //pass the $recipe to edit to the view
     public function updateRecipe($recipe_id)
     {
@@ -99,8 +99,9 @@ class RicetteController extends Controller
     }
     
     //TODO
-    public function updateProcess(Request $request)
+    public function updateProcess(Request $request,$recipe_id)
     {
+        $recipe = \App\Recipe::findOrFail($recipe_id);
         
     }
     

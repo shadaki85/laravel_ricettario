@@ -47,9 +47,7 @@ Route::group(['middleware' => ['web','auth']], function () {
         return view('create');
     });
     Route::post('/recipes',['as'=>'create.process','uses'=>'RicetteController@processInsert']);
-    
-    //test
-    Route::post('/newingredientinsert',['as'=>'new.ingredient','uses'=>'RicetteController@processInsertIngredient']);
+
     
     /****************************************************
     * SINGLE RECIPE SECTION
@@ -58,6 +56,12 @@ Route::group(['middleware' => ['web','auth']], function () {
     Route::get('/recipes/{recipe_id}/edit',['as'=>'recipe','uses'=>'RicetteController@updateRecipe']);    
     Route::put('/recipes/{recipe_id}',['as'=>'recipe','uses'=>'RicetteController@processUpdate']);
     Route::delete('/recipes/{recipe_id}',['as'=>'recipe','uses'=>'RicetteController@deleteRecipe']);
+    
+    
+    /****************************************************
+    * INGREDIENTS SECTION
+    ****************************************************/
+    Route::post('/newingredientinsert',['as'=>'new.ingredient','uses'=>'RicetteController@processInsertIngredient']);    
     
     
     /****************************************************
