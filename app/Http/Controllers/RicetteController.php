@@ -101,6 +101,7 @@ class RicetteController extends Controller
     //TODO
     public function updateProcess(Request $request)
     {
+        
     }
     
     //Inserts title, procedure, user id and ingredients needed.
@@ -174,13 +175,4 @@ class RicetteController extends Controller
         $ingredients = \App\Ingredient::all();
         return response()->json($ingredients);
     }
-    
-    //validator messages override
-    public function messages()
-    {
-    return [
-        'data.title.required' => 'Il titolo è richiesto!',
-        'data.procedure.required'  => 'La procedura per la preparazione della ricetta è obbligatoria!',
-    ];
-}
 }

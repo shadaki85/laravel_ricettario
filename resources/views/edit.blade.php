@@ -27,3 +27,6 @@
     @endif
 </div>    
 @endsection
+@section('scripts')
+    <script src="../../resources/js/scripts.js"></script>
+@endsection

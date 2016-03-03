@@ -71,7 +71,7 @@ Route::group(['middleware' => ['web','auth']], function () {
     * ADMIN SECTION
     ****************************************************/
     Route::group(['middleware' => 'isadmin'], function(){
-        Route::get('/home/admin',['as'=>'home.admin','uses'=>'RicetteController@adminHome']);
+        Route::get('/home/admin',['as'=>'admin','uses'=>'RicetteController@adminHome']);
         Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@changePerm']);
         Route::delete('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@deleteUser']);
     });
