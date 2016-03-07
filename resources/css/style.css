@@ -1,0 +1,15 @@
+.searchButton{
+  padding-top: 10px;
+  float:right;
+  background:none;
+  border:none!important;
+  color:#777;
+}
+
+.searchButton:focus {
+  outline: none;
+}
+
+.searchButton:hover {
+  color: #333;
+}

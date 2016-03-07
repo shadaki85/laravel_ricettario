@@ -12,7 +12,7 @@
         @endforeach
     </ul> 
     <p>{{ $recipe->procedure }}</p>
-    @if(Auth::user()->id == $recipe->user || Auth::user()->isAdmin == 1)
+    @if(Auth::user()->id == $recipe->user_id || Auth::user()->isAdmin == 1)
         <table>
             <tr>
                 {!! Form::open(['url'=>['recipes',$recipe->id], 'method'=>'put']) !!}
@@ -26,7 +26,4 @@
         </table>
     @endif
 </div>    
-@endsection
-@section('scripts')
-    <script src="../../resources/js/scripts.js"></script>
 @endsection

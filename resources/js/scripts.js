@@ -38,7 +38,7 @@ $(document).ready(function(){
     });
     
     //populate drop down list from JSON storing JSON in var getJsn
-    $.getJSON("../api/ingredients", function(result) {
+    $.getJSON("api/ingredients", function(result) {
         for (var i = 0; i < result.length; i++) {
         	ddl.append('<option value="' + result[i].name + '">' + result[i].name + '</option>');
         }
@@ -209,5 +209,17 @@ $(document).ready(function(){
             }
         });
     });
-
+    
+    //Search POSTing with AJAX
+    $('#searchButton').click(function(){
+        var searchdata = $('#searchInput');
+        $.ajax({
+            type: "POST",
+            data : {'search':searchdata.val(), '_token': $('input[name=_token]').val()},
+            url: "../public/search",
+            success: function(){
+                window.location.href = 'results';
+            }
+            });
+    });
 });

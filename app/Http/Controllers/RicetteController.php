@@ -157,17 +157,16 @@ class RicetteController extends Controller
     * SEARCH AND JSON SECTION
     ****************************************************/
     
-    //to finish
-    public function search($search_input)
+    //TO FINISH
+    //add minimum characters limit
+    //finish the view!
+    public function search(Request $request)
     {
-        $titlesMatches = \App\Recipe::where('title','like','%($search_input)%');
-        $proceduresMatches = \App\Recipe::Where('procedure','like','%($search_input)%');
-        $usersMatches = \App\Recipe::Where('name','like','%($search_input)%');
+        $titlesMatches = \App\Recipe::where('title','like','%'.($request->search).'%')->get();
+        $proceduresMatches = \App\Recipe::Where('procedure','like','%'.($request->search).'%')->get();
+        $usersMatches = \App\User::Where('name','like','%'.($request->search).'%')->get();
         
-        dd($titlesMatches);
-        
-        //write the view!----------------------------------------------------------------------------------------------------------------------
-        //return view('results',['titlesMatches'=>$titlesMatches,'proceduresMatches'=>$proceduresMatches]);
+        return view('results',['titlesMatches'=>$titlesMatches,'usersMatches'=>$usersMatches,'proceduresMatches'=>$proceduresMatches]);
     }
     
     //expose a json with all the ingredients

@@ -15,6 +15,8 @@
                 <td>{{ $user->name }}</td><td>{{ $recipe->title }}</td><td>{{ substr($recipe->procedure,0,20) }}...</td><td>{{ $recipe->created_at }}</td>
                 @if(Auth::user()->id == $user->id || Auth::user()->isAdmin == 1)
                     <td><a class="btn btn-danger" href="recipes/{{ $recipe->id }}/edit" role="button">Modifica</a></td>
+                @else
+                    <td><button class="btn btn-danger" role="button" disabled>Modifica</a></td>
                 @endif
                 <td><a class="btn btn-success" href="recipes/{{ $recipe->id }}" role="button">Mostra Ricetta</a></td>
             </tr>

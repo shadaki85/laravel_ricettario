@@ -32,7 +32,7 @@ Route::group(['middleware' => ['web']], function () {
 
 
 /****************************************************
-* LANDING SECTION
+* LANDING SECTION (LOGGED IN USERS)
 ****************************************************/
 Route::group(['middleware' => ['web','auth']], function () {
     Route::get('/', function(){
@@ -67,7 +67,10 @@ Route::group(['middleware' => ['web','auth']], function () {
     /****************************************************
     * SEARCH AND API SECTION
     ****************************************************/
-    Route::get('/search/{search_input}',['as'=>'search','uses'=>'RicetteController@search']);
+    Route::post('/search',['as'=>'search','uses'=>'RicetteController@search']);
+    Route::get('/search',function(){
+        return redirect()->route('recipes');
+    });
     Route::get('/api/ingredients',['as'=>'getIngredients','uses'=>'RicetteController@exposeJson']);
     
     
