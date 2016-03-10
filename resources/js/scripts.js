@@ -149,7 +149,7 @@ $(document).ready(function(){
             $.ajax({
                 type: "POST",
                 data : {'newingr':newIngred[counter2], '_token': $('input[name=_token]').val()},
-                url: "../newingredientinsert"
+                url: "newingredientinsert"
             });
             
             counter2++;
@@ -181,11 +181,11 @@ $(document).ready(function(){
             
             type: "POST",
             data : {'data':data, '_token': $('input[name=_token]').val()},
-            url: "../recipes",
+            url: "recipes",
             
             //on success redirect to recipes home page
             success:function(){
-                window.location.href = '../recipes';
+                window.location.href = 'recipes';
             },
             
             //on validator error, show the error list
@@ -210,16 +210,45 @@ $(document).ready(function(){
         });
     });
     
-    //Search POSTing with AJAX
-    $('#searchButton').click(function(){
-        var searchdata = $('#searchInput');
+    // POSTing with AJAX recipe EDIT (TODO)
+    $('#editButton').click(function(){    
+        var data = {
+            'title':title.val(),
+            'procedure':procedure.val(),
+            'ingred':ingred.concat(newIngred)
+        };
+        
+        var errList = $('#validatorErrorList');
         $.ajax({
+            
             type: "POST",
-            data : {'search':searchdata.val(), '_token': $('input[name=_token]').val()},
-            url: "../public/search",
-            success: function(){
-                window.location.href = 'results';
+            data : {'data':data, '_token': $('input[name=_token]').val()},
+            url: "recipes",
+            
+            //on success redirect to recipes home page
+            success:function(){
+                window.location.href = 'recipes';
+            },
+            
+            //on validator error, show the error list
+            error: function(xhr,status, response) {
+                errList.text("");
+                var error = jQuery.parseJSON(xhr.responseText);
+                
+                for(var e in error.message){
+                    if(error.message.hasOwnProperty(e)){
+                        error.message[e].forEach(function(val){
+                            errList.append('<li>'+val+'</li>');
+                        });
+                    }
+                }
+            },
+            
+            //the sending process may take a while, show that we are processing data!
+            beforeSend: function () {
+                errList.text("");
+                errList.text("Inserimento ricetta...attendere!");
             }
-            });
+        });
     });
 });

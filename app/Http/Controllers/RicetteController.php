@@ -28,18 +28,18 @@ class RicetteController extends Controller
         return view('admin',['users'=>$users]);
     }
         
-     //change from 'user' to 'admin' and vice-versa
-    public function changePerm($user_id)
+     //changes from 'user' to 'admin' and vice-versa and modifies name
+    public function modifyUser(Request $request, $user_id)
     {
         $user = \App\User::findOrFail($user_id);
-        if ($user->isAdmin == 0)
+        
+        $user->isAdmin = $request->isAdmin;
+
+        if(isset($request->name) && $request->name != $user->name && $request->name != "")
         {
-            $user->isAdmin = 1;
+            $user->name = $request->name;
         }
-        else 
-        {
-            $user->isAdmin = 0;
-        }
+        
         $user->save();
         return redirect()->route('admin');
     }
@@ -72,14 +72,12 @@ class RicetteController extends Controller
     public function showAll()
     {
         $users = \App\User::all();
-
         return view('show',['users'=>$users]);
     }
     
     //returns the single $recipe_id recipe.
     public function showOne($recipe_id)
     {
-        $user = \App\User::findOrFail(Auth::user()->id);
         $recipe = \App\Recipe::find($recipe_id);
         return view('showone',['recipe'=>$recipe]);
     }
@@ -99,9 +97,10 @@ class RicetteController extends Controller
     }
     
     //TODO
-    public function updateProcess(Request $request,$recipe_id)
+    public function processUpdate(Request $request,$recipe_id)
     {
         $recipe = \App\Recipe::findOrFail($recipe_id);
+        dd($request);
         
     }
     
@@ -157,16 +156,69 @@ class RicetteController extends Controller
     * SEARCH AND JSON SECTION
     ****************************************************/
     
-    //TO FINISH
-    //add minimum characters limit
-    //finish the view!
+    //search into the database for user input
     public function search(Request $request)
     {
-        $titlesMatches = \App\Recipe::where('title','like','%'.($request->search).'%')->get();
-        $proceduresMatches = \App\Recipe::Where('procedure','like','%'.($request->search).'%')->get();
-        $usersMatches = \App\User::Where('name','like','%'.($request->search).'%')->get();
+        //validate user input.
+        $rules = [ 
+                'search' => 'min:3|required',
+            ];
+            
+        $messages = [
+                'search.min' => 'Devi inserire almeno 3 caratteri da cercare!',
+                'search.required' => 'Devi inserire almeno 3 caratteri da cercare!',
+            ];
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $errors = $validator->errors();
         
-        return view('results',['titlesMatches'=>$titlesMatches,'usersMatches'=>$usersMatches,'proceduresMatches'=>$proceduresMatches]);
+        if ($validator->fails()) {
+            return redirect()->route('recipes')->withErrors($errors);
+        }
+        
+        //queries 
+        $recipesMatches = \App\Recipe::where('title','like','%'.($request->search).'%')
+                                     ->orWhere('procedure','like','%'.($request->search).'%')
+                                     ->get();
+        $usersMatches = \App\User::where('name','like','%'.($request->search).'%')
+                                     ->orWhere('email','like','%'.($request->search).'%')
+                                     ->get();
+        $ingredientsMatches = \App\Ingredient::where('name','like','%'.($request->search).'%')
+                                     ->get();
+        
+        $searchInput= $request->search;
+        
+        //highlight what we have found!
+        foreach($ingredientsMatches as $ingredient){
+            if (stripos($ingredient->name,$searchInput) !== false)
+            {            
+                $ingredient->name = substr_replace($ingredient->name,('<b class="highlight">'.$searchInput.'</b>'),stripos($ingredient->name,$searchInput),strlen($searchInput));
+            } 
+        }
+        
+        foreach($recipesMatches as $recipe){
+            if (stripos($recipe->title,$searchInput) !== false)
+            {            
+                $recipe->title = substr_replace($recipe->title,('<b class="highlight">'.$searchInput.'</b>'),stripos($recipe->title,$searchInput),strlen($searchInput));
+            }
+            if (stripos($recipe->procedure,$searchInput) !== false)
+            {
+                $recipe->procedure = substr_replace($recipe->procedure,('<b class="highlight">'.$searchInput.'</b>'),stripos($recipe->procedure,$searchInput),strlen($searchInput));
+                
+            }
+        }
+        
+        foreach($usersMatches as $user){
+            if (stripos($user->name,$searchInput) !== false)
+            {            
+                $user->name = substr_replace($user->name,('<b class="highlight">'.$searchInput.'</b>'),stripos($user->name,$searchInput),strlen($searchInput));
+            }
+            if (stripos($user->email,$searchInput) !== false)
+            {            
+                $user->email = substr_replace($user->email,('<b class="highlight">'.$searchInput.'</b>'),stripos($user->email,$searchInput),strlen($searchInput));
+            }
+        }
+        
+        return view('results',['ingredientsMatches'=>$ingredientsMatches,'recipesMatches'=>$recipesMatches,'usersMatches'=>$usersMatches,'searchInput'=>$request->search]);
     }
     
     //expose a json with all the ingredients
@@ -174,5 +226,33 @@ class RicetteController extends Controller
     {
         $ingredients = \App\Ingredient::all();
         return response()->json($ingredients);
+    }
+    
+    /****************************************************
+    * INGREDIENTS SECTION
+    ****************************************************/   
+    public function showIngredients()
+    {
+        $ingredients = \App\Ingredient::all();
+        return view('ingredients',['ingredients'=>$ingredients]);
+    }
+    
+    public function deleteIngredient($ingredient_id)
+    {
+        \App\Ingredient::destroy($ingredient_id);
+        return redirect()->route('ingredients');
+    }
+    
+    public function modifyIngredient(Request $request, $ingredient_id)
+    {
+        $ingr = \App\Ingredient::findOrFail($ingredient_id);
+        
+        if ($request->name != "")
+        {
+            $ingr->name = $request->name;
+        }
+        $ingr->type = $request->type;
+        $ingr->save();
+        return redirect()->route('ingredients');
     }
 }

@@ -12,24 +12,33 @@
         </tr>
         @foreach($users as $user)
             <tr>
-                <td>{{ $user->id }}</td><td>{{ $user->name }}</td><td>{{ $user->email }}</td><td>{{ $user->created_at }}</td><td>{{ $user->recipes->count() }}</td>
-                <td>
-                    @if ($user->isAdmin == 1)
-                        Admin
-                    @else
-                        Utente
-                    @endif
-                </td>
+                <td>{{ $user->id }}</td>
                 @if ($user->id != Auth::user()->id)
-                {!! Form::open(['url'=>['user',$user->id], 'method'=>'delete']) !!}
-                <td>{!! Form::submit('Elimina Utente',['class'=>'btn btn-danger','onclick'=>'return confirm("Sei sicuro di voler cancellare l\'utente?");']) !!}</td>
-                {!! Form::close() !!}
-                {!! Form::open(['url'=>['user',$user->id], 'method'=>'put']) !!}
-                <td>{!! Form::submit('Modifica Permessi',['class'=>'btn btn-success']) !!}</td>
-                {!! Form::close() !!}
+                    {!! Form::open(['url'=>['user',$user->id], 'method'=>'put']) !!}
+                    <td>{!! Form::text('name',$user->name) !!}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->created_at }}</td>
+                    <td>{{ $user->recipes->count() }}</td>
+                    <td>{!! Form::select('isAdmin', ['1' => 'Admin', '0' => 'Utente'],$user->isAdmin);!!}</td>
+                    <td>{!! Form::submit('Modifica',['class'=>'btn btn-success']) !!}</td>
+                    {!! Form::close() !!}
+                    {!! Form::open(['url'=>['user',$user->id], 'method'=>'delete']) !!}
+                    <td>{!! Form::submit('Elimina Utente',['class'=>'btn btn-danger','onclick'=>'return confirm("Sei sicuro di voler cancellare l\'utente?");']) !!}</td>
+                    {!! Form::close() !!}
                 @else
-                <td><button class="btn btn-danger" disabled>Elimina Utente</button></td>
-                <td><button class="btn btn-success" disabled>Modifica Permessi</button></td>
+                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->created_at }}</td>
+                    <td>{{ $user->recipes->count() }}</td>
+                    <td>
+                        @if ($user->isAdmin == 1)
+                            Admin
+                        @else
+                            Utente
+                        @endif
+                    </td>
+                    <td><button class="btn btn-success" disabled>Modifica</button></td>
+                    <td><button class="btn btn-danger" disabled>Elimina Utente</button></td>
                 @endif
             </tr>
         @endforeach

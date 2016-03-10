@@ -7,7 +7,7 @@
     <h1>Ciao, {{ Auth::user()->name }}. Ecco la lista di tutte le ricette!</h1>
    <table class="table">
         <tr>
-            <th>AUTORE</th><tH>TITOLO</th><th>PROCEDURA</th><th>DATA INSERIMENTO</th>
+            <th>AUTORE</th><th>TITOLO</th><th>PROCEDURA</th><th>DATA INSERIMENTO</th>
         </tr>
         @foreach($users as $user)
             @foreach($user->recipes as $recipe)

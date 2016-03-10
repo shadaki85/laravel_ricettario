@@ -4,19 +4,24 @@
 
 @section('content')
 <div class="col-md-10 col-md-offset-1">
-    <h1>{{ $recipe->title }}</h1>
-    <h5>Ingredienti:</h5>
-    <ul>
-        @foreach($recipe->ingredients as $ingredient)
-        <li>{{ ucfirst($ingredient->name) }} - {{$ingredient->pivot->quantity}} {{ ucfirst($ingredient->type) }}</li>
-        @endforeach
-    </ul> 
-    <p>{{ $recipe->procedure }}</p>
     @if(Auth::user()->id == $recipe->user_id || Auth::user()->isAdmin == 1)
+                {!! Form::open(['url'=>['recipes',$recipe->id],'class'=>'form-inline','method'=>'put']) !!}
+                <h1>{!! Form::text('title',$recipe->title)!!}</h1>
+                <h3>Ingredienti:</h3>
+                <ul>
+                @foreach($recipe->ingredients as $ingredient)
+                    <li>
+                    {!! Form::text('name',$ingredient->name)!!}
+                    {!! Form::text('quantity',$ingredient->pivot->quantity)!!}
+                    {!! Form::select('type', ['cl' => 'cl', 'gr' => 'gr', 'unita' => 'unità'],$ingredient->type);!!}
+                    </li>
+                @endforeach
+                </ul>
         <table>
-            <tr>
-                {!! Form::open(['url'=>['recipes',$recipe->id], 'method'=>'put']) !!}
-                <td>{!! Form::submit('Modifica',['class'=>'btn btn-danger']) !!}</td>
+            <tr> 
+                <h3>Procedura:</h3>
+                {!! Form::textarea('procedure',$recipe->procedure,['rows'=>'20','cols'=>'100'])!!}
+                <td>{!! Form::submit('Modifica',['class'=>'btn btn-success']) !!}</td>
                 {!! Form::close() !!}
                 
                 {!! Form::open(['url'=>['recipes',$recipe->id], 'method'=>'delete']) !!}

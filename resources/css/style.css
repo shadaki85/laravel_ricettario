@@ -13,3 +13,16 @@
 .searchButton:hover {
   color: #333;
 }
+
+.absolute{
+  position:absolute;
+  top:8px;
+  left:10px;
+  width:300px;
+  padding:5px;
+  list-style-type: none;
+}
+
+.highlight{
+  background-color:#ff8080;
+}

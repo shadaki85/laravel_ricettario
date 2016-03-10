@@ -23,6 +23,9 @@
 |
 */
 
+
+
+
 /****************************************************
 * UNLOGGED USERS SECTION
 ****************************************************/
@@ -38,6 +41,7 @@ Route::group(['middleware' => ['web','auth']], function () {
     Route::get('/', function(){
         return redirect()->route('recipes');
     });
+    
 
     /****************************************************
     * RECIPES SECTION
@@ -59,7 +63,7 @@ Route::group(['middleware' => ['web','auth']], function () {
     
     
     /****************************************************
-    * INGREDIENTS SECTION
+    * INGREDIENT INSERTING SECTION
     ****************************************************/
     Route::post('/newingredientinsert',['as'=>'new.ingredient','uses'=>'RicetteController@processInsertIngredient']);    
     
@@ -79,7 +83,12 @@ Route::group(['middleware' => ['web','auth']], function () {
     ****************************************************/
     Route::group(['middleware' => 'isadmin'], function(){
         Route::get('/home/admin',['as'=>'admin','uses'=>'RicetteController@adminHome']);
-        Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@changePerm']);
+        Route::get('/ingredients',['as'=>'ingredients','uses'=>'RicetteController@showIngredients']);
+        Route::delete('/ingredient/{ingredient_id}',['as'=>'ingredientDelete','uses'=>'RicetteController@deleteIngredient']);
+        Route::put('/ingredient/{ingredient_id}',['as'=>'ingredientModifye','uses'=>'RicetteController@modifyIngredient']);
+        
+        Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@modifyUser']);
         Route::delete('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@deleteUser']);
+        
     });
 });    

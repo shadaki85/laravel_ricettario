@@ -8,7 +8,8 @@
     <base href="{{URL::to('/')}}/">
     
     <title>ArancioZafferano</title>
-
+    <!--Favicon-->
+    <link rel="shortcut icon" type="image/png" href="../resources/img/favicon.png"/>
     <!-- Fonts -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
     <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700" rel='stylesheet' type='text/css'>
@@ -54,6 +55,7 @@
                     <li><a href="{{ url('recipes/new') }}">Nuova Ricetta</a></li>
                         @if(Auth::user()->isAdmin == 1)
                         <li><a href="{{ url('home/admin') }}">Admin Panel</a></li>
+                        <li><a href="{{ url('ingredients') }}">Gestione Ingredienti</a></li>
                         @endif
                     @endif
                 </ul>
@@ -81,11 +83,20 @@
                     {!! Form::button('',['class'=>'fa fa-search searchButton','type'=>'submit']) !!}
                 {!! Form::close() !!}
                 @endif
+                <li>
+                    @if($errors->any())
+                    <ul class="alert alert-danger absolute">
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                    </ul>
+                    @endif
+                </li>
                 </ul>
             </div>
         </div>
     </nav>
-
+    
     @yield('content')
 
     <!-- JavaScripts -->

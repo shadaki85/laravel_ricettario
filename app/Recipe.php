@@ -15,6 +15,6 @@ class Recipe extends Model
     
     public function user()
     {
-        return $this->belongsTo('App\User','recipe_id');
+        return $this->belongsTo('App\User','user_id');
     }
 }
