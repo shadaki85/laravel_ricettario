@@ -29,7 +29,7 @@
         }
     </style>
 </head>
-<body id="app-layout">
+<body id="app-layout" data-val="suca">
     <nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">

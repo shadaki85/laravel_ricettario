@@ -26,3 +26,14 @@
 .highlight{
   background-color:#ff8080;
 }
+
+.cancelButton{
+  color:red;
+  outline:none;
+}
+
+.cancelButton:hover{
+  color:#ff4d4d;
+  text-decoration: none;
+  cursor: pointer;
+}

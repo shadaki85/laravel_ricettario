@@ -19,6 +19,16 @@ $(document).ready(function(){
     $('#selectIngredientButton').prop('disabled',true);
     $('#newIngredientButton').prop('disabled',true);
     
+        
+    //populate drop down list from JSON storing JSON in var getJsn
+    $.getJSON("api/ingredients", function(result) {
+        for (var i = 0; i < result.length; i++) {
+        	ddl.append('<option value="' + result[i].name + '">' + result[i].name + '</option>');
+        }
+        getJsn  = result;
+
+    });
+    
     //buttons will be clickable only if we have something selected/in the input textbox
     $('#newingredient').keyup(function(){
         if ($('#newingredient').val() != ""){
@@ -36,26 +46,18 @@ $(document).ready(function(){
             $('#selectIngredientButton').prop('disabled',true);
         }
     });
-    
-    //populate drop down list from JSON storing JSON in var getJsn
-    $.getJSON("api/ingredients", function(result) {
-        for (var i = 0; i < result.length; i++) {
-        	ddl.append('<option value="' + result[i].name + '">' + result[i].name + '</option>');
-        }
-        getJsn  = result;
-
-    });
 
     //handle select ingredient button click
     $('#selectIngredientButton').click(function(){
         var selected = ddl.val();
+        var cancelButtonHtml = ' <a id="cancelButton" data-val="'+selected+'" class="fa fa-times cancelButton"></a>';
         $('#already').text('');
         $('#already2').text('');
         
         if (selected != null && type.val() != null && ingrQuantity.val() != "" && !isNaN(ingrQuantity.val()))
         {
             //let the user see what he has selected
-            $('#selected').append(selected+' '+ingrQuantity.val()+' '+type.val()+'<br />');
+            $('#selected').append('<li id="'+selected+'">'+selected+' '+ingrQuantity.val()+' '+type.val()+cancelButtonHtml+'</li>');
             
             //remove the selected ingredient from the ddl 
             $('#ingredients :selected').remove();
@@ -90,12 +92,11 @@ $(document).ready(function(){
         
         $('#already2').text('');
         $('#already').text('');
-
+        
         if(newingredient.val() != '' && newIngrQuantity.val() != '' && !isNaN(newIngrQuantity.val()) && typeNew.val() != null)
         {
-            
             var newIngr = newingredient.val().toLowerCase();
-            
+            var cancelButtonHtml = ' <a id="cancelButton" data-val="'+newIngr+'" class="fa fa-times cancelButton"></a>';
             
             //presence check
             for (var i = 0; i < getJsn.length; i++)
@@ -130,7 +131,7 @@ $(document).ready(function(){
             }
             
             //let the user see what he has selected
-            $('#selected').append(newIngr+' '+newIngrQuantity.val()+' '+typeNew.val()+'<br />');
+            $('#selected').append('<li id="'+newIngr+'">'+newIngr+' '+newIngrQuantity.val()+' '+typeNew.val()+cancelButtonHtml+'</li>');
             
             //add values to array
             newIngred[counter2] = {
@@ -168,50 +169,37 @@ $(document).ready(function(){
         }
     });
     
-    // POSTing with AJAX recipe and ingredients!
-    $('#inviaButton').click(function(){    
-        var data = {
-            'title':title.val(),
-            'procedure':procedure.val(),
-            'ingred':ingred.concat(newIngred)
-        };
+    //handles cancel button click event. removes element from list and array
+    $('body').on('click', 'a.cancelButton', function(){
+        var ingredToRemove =  $(this).data('val');
         
-        var errList = $('#validatorErrorList');
-        $.ajax({
-            
-            type: "POST",
-            data : {'data':data, '_token': $('input[name=_token]').val()},
-            url: "recipes",
-            
-            //on success redirect to recipes home page
-            success:function(){
-                window.location.href = 'recipes';
-            },
-            
-            //on validator error, show the error list
-            error: function(xhr,status, response) {
-                errList.text("");
-                var error = jQuery.parseJSON(xhr.responseText);
-                
-                for(var e in error.message){
-                    if(error.message.hasOwnProperty(e)){
-                        error.message[e].forEach(function(val){
-                            errList.append('<li>'+val+'</li>');
-                        });
-                    }
-                }
-            },
-            
-            //the sending process may take a while, show that we are processing data!
-            beforeSend: function () {
-                errList.text("");
-                errList.text("Inserimento ricetta...attendere!");
+        //removes that specific ingredient from the list.
+        $('#'+ingredToRemove).remove();
+        
+        //add the ingredient back in the ddl
+        ddl.append('<option value="' + ingredToRemove + '">' + ingredToRemove + '</option>');
+        
+        //removes the ingredient from the arrays (and lowers the counters)
+        for(var i=0;i<ingred.length;i++)
+        {
+            if(ingred[i].name == ingredToRemove)
+            {
+                ingred.splice(ingred[i],1);
+                counter1--;
             }
-        });
+        }
+        for(var z=0;z<newIngred.length;z++)
+        {
+            if(newIngred[z].name == ingredToRemove)
+            {
+                newIngred.splice(newIngred[z],1);
+                counter2--;
+            }
+        }
     });
     
-    // POSTing with AJAX recipe EDIT (TODO)
-    $('#editButton').click(function(){    
+    // POSTing with AJAX recipe and ingredients!
+    $('#inviaButton').click(function(){    
         var data = {
             'title':title.val(),
             'procedure':procedure.val(),

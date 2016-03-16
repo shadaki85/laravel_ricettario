@@ -9,12 +9,14 @@
                 <h1>{!! Form::text('title',$recipe->title)!!}</h1>
                 <h3>Ingredienti:</h3>
                 <ul>
+                <?php $i=1; ?>
                 @foreach($recipe->ingredients as $ingredient)
                     <li>
-                    {!! Form::text('name',$ingredient->name)!!}
-                    {!! Form::text('quantity',$ingredient->pivot->quantity)!!}
-                    {!! Form::select('type', ['cl' => 'cl', 'gr' => 'gr', 'unita' => 'unità'],$ingredient->type);!!}
+                    {!! Form::text('name'.$i,$ingredient->name)!!}
+                    {!! Form::text('quantity'.$i,$ingredient->pivot->quantity)!!}
+                    {{ ucfirst($ingredient->type) }}
                     </li>
+                    <?php $i++; ?>
                 @endforeach
                 </ul>
         <table>

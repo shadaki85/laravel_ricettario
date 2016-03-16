@@ -9,7 +9,7 @@
         <div class="form-group">
             {!! Form::text('title',null,['class'=>'form-control','placeholder'=>'Titolo','id'=>'title']) !!}<br />
             {!! Form::textarea('procedure',null,['class'=>'form-control pull-left','placeholder'=>'Procedura','id'=>'procedure']) !!}
-            <div style="float:left;" id='selected'></div>
+            <ul style="float:left;" id='selected'></ul>
             <br />
             {!! Form::label('ingredients','Seleziona gli ingredienti necessari:') !!}
             <br />
