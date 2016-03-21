@@ -8,7 +8,7 @@
         {!! Form::open(['url'=>'recipes', 'method'=>'post', 'id'=>'form', 'class'=>'form-inline']) !!}
         <div class="form-group">
             {!! Form::text('title',null,['class'=>'form-control','placeholder'=>'Titolo','id'=>'title']) !!}<br />
-            {!! Form::textarea('procedure',null,['class'=>'form-control pull-left','placeholder'=>'Procedura','id'=>'procedure']) !!}
+            {!! Form::textarea('procedure',null,['class'=>'form-control pull-left','placeholder'=>'Procedura','id'=>'procedure','rows'=>'20','cols'=>'80']) !!}
             <ul style="float:left;" id='selected'></ul>
             <br />
             {!! Form::label('ingredients','Seleziona gli ingredienti necessari:') !!}
@@ -37,7 +37,7 @@
                     <a id="inviaButton" class="btn btn-success" data-token="{!! csrf_token() !!}">Invia</a>
                 </td>
                 <td>
-                    <a class="btn btn-danger" href="../recipes" role="button">Back</a></td>
+                    <a class="btn btn-danger" href="recipes" role="button">Back</a></td>
                 </td>
             </tr>    
         </table>

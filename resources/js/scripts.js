@@ -15,18 +15,39 @@ $(document).ready(function(){
     var getJsn;
     var title = $('#title');
     var procedure = $('#procedure');
+    var justNames = [];
     
     $('#selectIngredientButton').prop('disabled',true);
     $('#newIngredientButton').prop('disabled',true);
     
-        
     //populate drop down list from JSON storing JSON in var getJsn
+    //minus already selected ingredients if we are editing the recipe
     $.getJSON("api/ingredients", function(result) {
         for (var i = 0; i < result.length; i++) {
-        	ddl.append('<option value="' + result[i].name + '">' + result[i].name + '</option>');
+            justNames.push(result[i].name);
         }
-        getJsn  = result;
-
+        //console.log(justNames);
+        $('#selected li').each(function() {
+            var name = $(this).attr('id');
+            var quantity = $(this).attr('quantity');
+            var type = $(this).attr('type');
+            
+            var pos = $.inArray(name,justNames);
+            
+            //TOFINISH
+            console.log(name+" "+quantity+" "+type);
+            //ingred.push(name);
+            
+            if (pos > -1){
+                console.log("rimuovo "+name+" pos->"+pos);
+                justNames.splice(pos,1);
+            }
+        });
+        //console.log(justNames);
+        $.each(justNames,function(i,v){
+            ddl.append('<option value="' + v + '">' + v + '</option>');
+        });
+        getJsn  = justNames;
     });
     
     //buttons will be clickable only if we have something selected/in the input textbox
@@ -57,7 +78,7 @@ $(document).ready(function(){
         if (selected != null && type.val() != null && ingrQuantity.val() != "" && !isNaN(ingrQuantity.val()))
         {
             //let the user see what he has selected
-            $('#selected').append('<li id="'+selected+'">'+selected+' '+ingrQuantity.val()+' '+type.val()+cancelButtonHtml+'</li>');
+            $('#selected').append('<li id="'+selected+'" quantity="'+ingrQuantity.val()+'" type="'+type.val()+'">'+selected+' '+ingrQuantity.val()+' '+type.val()+cancelButtonHtml+'</li>');
             
             //remove the selected ingredient from the ddl 
             $('#ingredients :selected').remove();
@@ -131,7 +152,7 @@ $(document).ready(function(){
             }
             
             //let the user see what he has selected
-            $('#selected').append('<li id="'+newIngr+'">'+newIngr+' '+newIngrQuantity.val()+' '+typeNew.val()+cancelButtonHtml+'</li>');
+            $('#selected').append('<li id="'+newIngr+'" quantity="'+newIngrQuantity.val()+'" type="'+typeNew.val()+'">'+newIngr+' '+newIngrQuantity.val()+' '+typeNew.val()+cancelButtonHtml+'</li>');
             
             //add values to array
             newIngred[counter2] = {
@@ -172,7 +193,7 @@ $(document).ready(function(){
     //handles cancel button click event. removes element from list and array
     $('body').on('click', 'a.cancelButton', function(){
         var ingredToRemove =  $(this).data('val');
-        
+
         //removes that specific ingredient from the list.
         $('#'+ingredToRemove).remove();
         
