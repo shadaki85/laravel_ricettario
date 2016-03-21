@@ -90,5 +90,6 @@ Route::group(['middleware' => ['web','auth']], function () {
         Route::put('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@modifyUser']);
         Route::delete('/user/{user_id}',['as'=>'user','uses'=>'RicetteController@deleteUser']);
         
+        Route::get('/logs',['as'=>'logs','uses'=>'RicetteController@showLogs']);
     });
 });    

@@ -24,7 +24,7 @@ class RicetteController extends Controller
     //admin user-list page
     public function adminHome()
     {   
-        $users = \App\User::all();
+        $users = \App\User::all()->sortBy('id');
         return view('admin',['users'=>$users]);
     }
         
@@ -71,8 +71,9 @@ class RicetteController extends Controller
     //returns a collection of ALL the recipes. ($recipes)
     public function showAll()
     {
+        $recipes = \App\Recipe::all();
         $users = \App\User::all();
-        return view('show',['users'=>$users]);
+        return view('show',['users'=>$users,'recipes'=>$recipes]);
     }
     
     //returns the single $recipe_id recipe.
@@ -96,12 +97,52 @@ class RicetteController extends Controller
         return view('edit',['recipe'=>$recipe]);
     }
     
-    //TODO
+    //edits the current recipe with new title,procedure and ingredients
     public function processUpdate(Request $request,$recipe_id)
     {
-        $recipe = \App\Recipe::findOrFail($recipe_id);
-        dd($request);
+        //validate user inputs. we need at least 1 ingredient, title and procedure
+        $rules = [ 
+                'data.title' => 'required',
+                'data.procedure' => 'required',
+                'data.ingred' => 'required_without:data.newIngred',
+            ];
+            
+        $messages = [
+                'data.title.required' => 'Il titolo è richiesto!',
+                'data.procedure.required'  => 'La procedura per la preparazione della ricetta è obbligatoria!',
+                'data.ingred.required_without' => 'E necessario almeno un ingrediente!',
+            ];
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $errors = $validator->errors();
+        $errors =  json_decode($errors);
         
+        if ($validator->fails()) {
+            return response()->json([
+            'message' => $errors
+            ], 422);
+        }
+        
+        //this we will need if the editing user is not the owner (admin editing)
+        $userid = Auth::user()->id;
+
+        $recipe = \App\Recipe::findOrFail($recipe_id);       
+        
+        //insert the new values!
+        $recipe->title = $request->data['title'];
+        $recipe->procedure = $request->data['procedure'];
+        $recipe->user_id = $userid;
+        $recipe->save();
+        // removes old records recipe_ingredient from db
+        // creates new record into pivot table recipe-ingredient for each ingredient needed!
+        $oldIngrInPivot = \App\Recipe_Ingredient::where('recipe_id', '=' ,$recipe_id)->get();
+        foreach($oldIngrInPivot as $oldIngr)
+        {
+            \App\Recipe_Ingredient::destroy($oldIngr->id);
+        }
+        foreach ($request->data['ingred'] as $ingr){
+            $ingrInDb = \App\Ingredient::where('name','=',$ingr['name'])->first();
+            $pivot = \App\Recipe_Ingredient::create(['recipe_id'=>$recipe_id,'ingredient_id'=>$ingrInDb->id,'quantity'=>$ingr['quantity']]);
+        }
     }
     
     //Inserts title, procedure, user id and ingredients needed.

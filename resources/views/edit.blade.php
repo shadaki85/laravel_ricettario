@@ -44,7 +44,7 @@
             <tr>
                 <td>
                     {!! Form::close() !!}
-                    <a id="inviaButton" class="btn btn-success" data-token="{!! csrf_token() !!}">Modifica</a>
+                    <a id="inviaButton" type="edit" rec_id="{{$recipe->id}}" class="btn btn-success" data-token="{!! csrf_token() !!}">Modifica</a>
                 </td>
                 {!! Form::open(['url'=>['recipes',$recipe->id], 'method'=>'delete']) !!}
                 <td>{!! Form::submit('Elimina',['class'=>'btn btn-danger','onclick'=>'return confirm("Sei sicuro di voler cancellare la ricetta?");']) !!}</td>

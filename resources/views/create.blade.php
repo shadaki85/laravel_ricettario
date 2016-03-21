@@ -34,7 +34,7 @@
             <tr>
                 <td>
                     {!! Form::close() !!}
-                    <a id="inviaButton" class="btn btn-success" data-token="{!! csrf_token() !!}">Invia</a>
+                    <a id="inviaButton" type="new" class="btn btn-success" data-token="{!! csrf_token() !!}">Invia</a>
                 </td>
                 <td>
                     <a class="btn btn-danger" href="recipes" role="button">Back</a></td>

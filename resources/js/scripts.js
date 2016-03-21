@@ -20,33 +20,43 @@ $(document).ready(function(){
     $('#selectIngredientButton').prop('disabled',true);
     $('#newIngredientButton').prop('disabled',true);
     
-    //populate drop down list from JSON storing JSON in var getJsn
+    //populate drop down list from JSON storing justNames in var getJsn for further uses
     //minus already selected ingredients if we are editing the recipe
     $.getJSON("api/ingredients", function(result) {
+        
+        //filtering JSON. we need just the 'name' key
         for (var i = 0; i < result.length; i++) {
             justNames.push(result[i].name);
         }
-        //console.log(justNames);
+        
+        //for each ingredient already in "selected" this does:
         $('#selected li').each(function() {
+            
+            //gets its name,quantity,type and position in the array justNames
             var name = $(this).attr('id');
             var quantity = $(this).attr('quantity');
             var type = $(this).attr('type');
-            
             var pos = $.inArray(name,justNames);
             
-            //TOFINISH
-            console.log(name+" "+quantity+" "+type);
-            //ingred.push(name);
+            // adds values in ingred array (needed later for the ajax call)
+            ingred[counter1] = {
+                'name':name,
+                'quantity':quantity,
+                'type':type
+            };
+            counter1++;
             
+            // removes them in the justNames array
             if (pos > -1){
-                console.log("rimuovo "+name+" pos->"+pos);
                 justNames.splice(pos,1);
             }
         });
-        //console.log(justNames);
+        
+        // appends the remaining ingredients in the dropdownlist (ddl)
         $.each(justNames,function(i,v){
             ddl.append('<option value="' + v + '">' + v + '</option>');
         });
+        
         getJsn  = justNames;
     });
     
@@ -227,12 +237,28 @@ $(document).ready(function(){
             'ingred':ingred.concat(newIngred)
         };
         
+        //determining if sending an 'edit' or a 'new' recipe
+        var type;
+        var url;
+        if( $(this).attr('type') == "new")
+        {
+            type = "POST";
+            url = "recipes";
+        }
+        else
+        {
+            type = "PUT";
+            url = "recipes/"+$('#inviaButton').attr('rec_id');
+        }
+        
+        
         var errList = $('#validatorErrorList');
+        
+        
         $.ajax({
-            
-            type: "POST",
+            type: type,
             data : {'data':data, '_token': $('input[name=_token]').val()},
-            url: "recipes",
+            url: url,
             
             //on success redirect to recipes home page
             success:function(){
